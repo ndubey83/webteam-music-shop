@@ -1,4 +1,6 @@
-﻿<div class="modal fade" id="albumModal" tabindex="-1" role="dialog" aria-labelledby="albumModalLabel">
+﻿@using MusicShop.Models;
+@model Album
+ 
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -9,16 +11,16 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="row">
-                            <label>Album<input class="form-control" type="text" id="title" /></label>
+                            <label>Album<input class="form-control" disabled="disabled" type="text" id="title" value="@Model.Title" /></label>
                         </div>
                         <div class="row">
-                            <label>Artist <input class="form-control" type="text" id="artist" /></label>
+                            <label>Artist <input class="form-control" disabled="disabled" type="text" id="artist" value="@Model.Artist" /></label>
                         </div>
                         <div class="row">
-                            <label>Genre <input class="form-control" type="text" id="genre" /></label>
+                            <label>Genre <input class="form-control" disabled="disabled" type="text" id="genre" value="@Model.Genre" /></label>
                         </div>
                         <div class="row">
-                            <label>Year <input class="form-control" type="text" id="year" /></label>
+                            <label>Year <input class="form-control" disabled="disabled" type="text" id="year" value="@Model.Year"  /></label>
                         </div>
                     </div>
                     <div class="col-md-8">
@@ -30,7 +32,16 @@
                                     <th>Length</th>
                                 </tr>
                             </thead>
-                            <tbody class="tracks"></tbody>
+                            <tbody class="tracks">
+                                @foreach (var track in Model.Tracks.OrderBy(f => f.Number))
+                                {
+                                    <tr>
+                                        <td>@track.Number</td>
+                                        <td>@track.SongTitle</td>
+                                        <td>@track.Length</td>
+                                    </tr>
+                                }
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -40,4 +51,3 @@
 			</div>
 		</div>
 	</div>
-</div>

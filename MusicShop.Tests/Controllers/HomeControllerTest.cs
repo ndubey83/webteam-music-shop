@@ -8,8 +8,7 @@ namespace MusicShop.Tests.Controllers
     public class HomeControllerTest
     {
         [TestMethod]
-        public void Index()
-        {
+        public void Index() {
             // Arrange
             HomeController controller = new HomeController();
 
@@ -19,5 +18,35 @@ namespace MusicShop.Tests.Controllers
             // Assert
             Assert.IsNotNull(result);
         }
+
+        [TestMethod]
+        public void Album_Valid() {
+            // Arrange
+            HomeController controller = new HomeController();
+
+            // Act
+            PartialViewResult result = controller.Album(1) as PartialViewResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+
+            Assert.IsNotNull(result.Model);
+        }
+
+        [TestMethod]
+        public void Album_Invalid() {
+            // Arrange
+            HomeController controller = new HomeController();
+
+            // Act
+            PartialViewResult result = controller.Album(0) as PartialViewResult;
+
+            // Assert
+            Assert.IsNotNull(result);
+
+            Assert.IsNull(result.Model);
+
+        }
+
     }
 }

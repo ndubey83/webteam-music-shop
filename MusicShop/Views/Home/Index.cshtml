@@ -1,15 +1,19 @@
-﻿@using MusicShop.Models;
-@model Store
+﻿@using MusicShop.Models.ViewModel 
+@model SearchResultViewModel
+@*@using MusicShop.Models;
+@model Store *@
 
 @{
     ViewBag.Title = "Home Page";
+    var advanceDisplay = (!string.IsNullOrEmpty(Model.Genre) && Model.Genre != "Select a Genre") || Model.FromYear.HasValue || Model.ToYear.HasValue;
+    var advanceDisplayStyle = advanceDisplay ? "" : "display:none";
 }
 
 @using (Html.BeginForm())
 {
 <div class="row">
     <div class="col-md-10">
-        <input class="form-control" type="text" name="search" placeholder="Search"/>
+        @Html.TextBox("search", Model.Search, new {  placeholder="Search", @class="form-control"  })
     </div>
     <div class="col-md-2">
         <input class="form-control" type="submit" value="Search" />
@@ -20,21 +24,15 @@
 		<a id="advancedSearch" href="#" >Advanced Search</a>
 	</div>
 </div>
-<div class="row advancedSearch">
+<div class="row advancedSearch"  style="@advanceDisplayStyle">
     <div class="col-md-4">
-        <select name="genre" class="form-control">
-            <option value="">Select a Genre</option>
-            @foreach(var genre in Model.Albums.Select(_ => _.Genre).Distinct())
-            {
-                <option value="@genre">@genre</option>
-            }
-        </select>
+        @Html.DropDownList("genre", new SelectList(Model.AllGenre), "Select a Genre", new {@class="form-control" })
     </div>
     <div class="col-md-4">
-        <input class="form-control" type="number" name="fromYear" placeholder="From"/>
+        @Html.TextBox("fromYear", Model.FromYear , new { placeholder="From",   @class="form-control input-group date"  })
     </div>
     <div class="col-md-4">
-        <input class="form-control" type="number" name="toYear" placeholder="To"/>
+        @Html.TextBox("toYear", Model.ToYear, new { placeholder="To",  @class="form-control input-group date"  })
     </div>
 </div>
 }
@@ -50,7 +48,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach( var album in Model.Albums)
+				@foreach (var album in Model.Store.Albums)
                 {
                     <tr data-toggle="modal" data-target="#albumModal" data-url="@Url.Action("Album", new { id = album.Id })">
                         <td>@album.Title</td>
@@ -64,14 +62,42 @@
 	</div>
 </div>
 
-@section scripts{
-      <script>
-          $('#albumModal').on('show.bs.modal', function (event) {
-              var modal = $(this);
-              var element = $(event.relatedTarget);
-              var url = element.data('url');
+<div class="modal fade" id="albumModal" tabindex="-1" role="dialog" aria-labelledby="albumModalLabel">
+    <div id="albumModalContainer"></div>
+</div>
+    @section scripts{
+        <script>
+            $('#albumModal').on('show.bs.modal', function (event) {
+                var modal = $(this);
+                var element = $(event.relatedTarget);
+                var url = element.data('url');
+                //TODO: Bind the results
+                $.get(url, function (data) {
+                    $('#albumModalContainer').html(data);
+                })
+            });
 
-              //TODO: Bind the results
-          })
-      </script>  
-}
+            $('#advancedSearch').click(function () {
+                $('.advancedSearch').toggle();
+            });
+
+           
+            $(function () {
+                $('#fromYear').datetimepicker({
+                    viewMode: "years",
+                    format:"YYYY"
+                });
+                $('#toYear').datetimepicker({
+                    viewMode: "years",
+                    format: "YYYY",
+                    useCurrent: false
+                });
+                $("#fromYear").on("dp.change", function (e) {
+                    $('#toYear').data("DateTimePicker").minDate(e.date);
+                });
+                $("#toYear").on("dp.change", function (e) {
+                    $('#fromYear').data("DateTimePicker").maxDate(e.date);
+                });
+            });
+        </script>
+    }
